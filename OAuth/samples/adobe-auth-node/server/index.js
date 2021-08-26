@@ -3,7 +3,6 @@ const app = express();
 const session = require('express-session')
 const request = require('request-promise');
 const https = require('https');
-const bodyParser = require('body-parser');
 const adobeApiKey = require('../public/config.js').adobeApiKey;
 const adobeApiSecret = require('../public/config.js').adobeApiSecret;
 const fs = require('fs');
@@ -13,18 +12,20 @@ const path = require('path');
 const hostname = 'localhost';
 const port = 8000;
 
+/* Variables needed for authorization */
+const scopes = 'openid,creative_sdk,profile,address,AdobeID,email,offline_access' 
+const redirect_uri = 'https://localhost:8000/callback'
+
 /* Middlewares */
-app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../public')));
 app.set('views', path.join(__dirname, '../views'))
-app.set('view engine', 'jade')
+app.set('view engine', 'pug')
 app.use(session({
 	/* Change this to your own secret value */
     secret: 'this-is-secret',
-    resave: true,
+    resave: false,
     saveUninitialized: true,
     cookie: { 
-        secure: false,
         maxAge: 6000000
     }
 }));
@@ -36,16 +37,15 @@ app.get('/', function (req, res) {
 
 app.get('/login', function(req, res){
 	/* This will prompt user with the Adobe auth screen */
-	res.redirect(`https://ims-na1.adobelogin.com/ims/authorize?client_id=${adobeApiKey}&scope=openid,creative_sdk&response_type=code&redirect_uri=https://localhost:8000/callback`)
+	res.redirect(`https://ims-na1.adobelogin.com/ims/authorize/v2?client_id=${adobeApiKey}&scope=${scopes}&response_type=code&redirect_uri=${redirect_uri}`)
 })
 
 app.get('/callback', function(req, res){
 	/* Retrieve authorization code from request */
 	let code = req.query.code;
-
 	/* Set options with required paramters */
 	let requestOptions = {
-        uri: `https://ims-na1.adobelogin.com/ims/token?grant_type=authorization_code&client_id=${adobeApiKey}&client_secret=${adobeApiSecret}&code=${code}`,
+        uri: `https://ims-na1.adobelogin.com/ims/token/v3?grant_type=authorization_code&client_id=${adobeApiKey}&client_secret=${adobeApiSecret}&code=${code}`,
         method: 'POST',
         json: true
 	}
@@ -67,7 +67,7 @@ app.get('/profile', function(req, res){
 		/* Grab the token stored in req.session 
 		and set options with required parameters */
 		let requestOptions = {
-	        uri: `https://ims-na1.adobelogin.com/ims/userinfo?client_id=${adobeApiKey}`,
+	        uri: `https://ims-na1.adobelogin.com/ims/userinfo/v2?client_id=${adobeApiKey}`,
 	        headers: {
 	        	Authorization: `Bearer ${req.session.token}`
 	        },
