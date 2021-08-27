@@ -89,6 +89,18 @@ app.get('/profile', function(req, res){
 	}
 })
 
+app.get('/logout', function(req, res){
+	if (req.session){
+		req.session.destroy(err => {
+			if (err){
+				res.render('index', {'response': 'Unable to log out'});
+			} else{
+				res.render('index', {'response': 'Logout successful!'})
+			}
+		});
+	}
+})
+
 /* Set up a HTTS server with the signed certification */
 var httpsServer = https.createServer({
 	key: fs.readFileSync(path.join(__dirname, 'key.pem')),
