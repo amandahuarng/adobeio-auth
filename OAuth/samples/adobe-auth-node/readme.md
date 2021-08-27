@@ -22,9 +22,9 @@ After setting up the sample, you will have a Node.js app that:
   - [Technology Used](#technology-used)
   - [Prerequisites](#prerequisites)
   - [Configuration](#configuration)
-    - [Create an OpenSSL cert](#create-an-openssl-cert)
     - [Install Node.js packages](#install-nodejs-packages)
     - [Store your Adobe API credentials as Environment Variables](#store-your-adobe-api-credentials-as-environment-variables)
+    - [Create an OpenSSL cert](#create-an-openssl-cert)
   - [Usage](#usage)
   - [Other Resources](#other-resources)
 
@@ -54,24 +54,6 @@ You must also have [a registered app on the Adobe Developer Console](../../web-o
 ## Configuration
 
 The following steps will help you get this sample up and running.
-
-### Create an OpenSSL cert
-
-Adobe OAuth 2.0 requires SSL, so you will need to create a self-signed cert using the OpenSSL CLI. Be sure to run this in the `./server` directory:
-
-```
-$ cd server
-$ openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365
-```
-
-Make sure that after running this command you have the `cert.pem` and `key.pem` files at the top level of the `.server` directory.
-
-If this step fails, run the following line in your terminal to prompt an instance of Google Chrome with CORS disabled: 
-
-```
-open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args --user-data-dir="/tmp/chrome_dev_test" --disable-web-securityopen -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args --user-data-dir="/tmp/chrome_dev_test" --disable-web-security
-```
-Note that this method is not recommended in terms of security but will suffice as a quick workaround during development.
 
 ### Install Node.js packages
 
@@ -111,6 +93,62 @@ catch (err) {}
 
 You can get your Adobe API Key and Secret from your registered app page on the [Adobe Developer Console](../../web-oauth2.0-guide.md#register-your-application-and-enable-apis).
 
+
+### Create an OpenSSL cert
+
+Adobe OAuth 2.0 requires SSL, so you will need to create a self-signed cert using the OpenSSL CLI. Be sure to run this in the `./server` directory:
+
+```
+$ cd server
+$ mkdir CA && cd CA
+$ openssl genrsa -out CA.key -des3 4096
+```
+This will generate a private key and request a simple passphrase of your choice. 
+Now we can generate a root CA certificate using the key generated. Run the following line: 
+
+```
+$ openssl req -x509 -sha256 -new -nodes -days 3650 -key CA.key -out CA.pem
+```
+We have specified that the root CA certificate will be valid for 10 years. Now that we have the key and certificate, we can sign the SSL certificate isnce we already created CA. Create a new directory `localhost` inside of `CA` and create the file `localhost.ext` inside. We will store the information that needs to be written into the signed SSL certificate into this file
+
+```
+$ mkdir localhost && cd localhost && touch localhost.ext
+```
+Then modify the file like below: 
+```
+authorityKeyIdentifier = keyid,issuer
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = localhost
+IP.1 = 127.0.0.1
+```
+
+Next, we will generate a key and use the key to generate a CSR (Certificate Signing Request): 
+```
+$ openssl genrsa -out localhost,key -des3 4096
+```
+This will generate a localhost private key and request a passphrase. Then use the following command to generate the CSR: 
+
+```
+$ openssl req -new -key localhost.key -out localhost.csr
+$ openssl x509 -req -in localhost.csr -CA ../CA.pem -CAkey ../CA.key -CAcreateserial -days 3650 -sha256 -extfile localhost.ext -out localhost.crt
+$ openssl rsa -in localhost.key -out localhost.decrypted.key
+```
+This will take in the CSR (`localhost.csr`), the CA certification (`CA.pem` and `CA.key`), and the certificate extensions file (`localhost.ext`) to generate a `localhost.crt` certificate file, valid for ten years. The last line decrypts the `localhost.key` and stores that file. 
+
+The final step is to tell your browser to trust the CA certificate. We have to import the certificate. 
+
+In Chrome/Firefox, navigate to Settings/Options > Privacy and security > Managing SSL/View Certificates. Click on import and choose `CA.pem` then you should be able to run `https://localhost:8000` from Chrome or Firefox.
+
+If this step fails, run the following line in your terminal to prompt an instance of Google Chrome with CORS disabled: 
+
+```
+open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args --user-data-dir="/tmp/chrome_dev_test" --disable-web-securityopen -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args --user-data-dir="/tmp/chrome_dev_test" --disable-web-security
+```
+Note that this method is not recommended in terms of security but will suffice as a quick workaround during development.
 
 
 ## Usage

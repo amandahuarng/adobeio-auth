@@ -103,8 +103,8 @@ app.get('/logout', function(req, res){
 
 /* Set up a HTTS server with the signed certification */
 var httpsServer = https.createServer({
-	key: fs.readFileSync(path.join(__dirname, 'key.pem')),
-	cert: fs.readFileSync(path.join(__dirname, 'cert.pem'))
+	key: fs.readFileSync(path.join(__dirname,'./CA/localhost/localhost.decrypted.key')),
+	cert: fs.readFileSync(path.join(__dirname, './CA/localhost/localhost.crt'))
 }, app).listen(port, hostname, (err) => {
 	if (err) console.log(`Error: ${err}`);
 	console.log(`listening on port ${port}!`);
