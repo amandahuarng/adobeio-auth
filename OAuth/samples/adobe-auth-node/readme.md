@@ -24,7 +24,7 @@ After setting up the sample, you will have a Node.js app that:
   - [Configuration](#configuration)
     - [Create an OpenSSL cert](#create-an-openssl-cert)
     - [Install Node.js packages](#install-nodejs-packages)
-    - [Enter your Adobe API credentials](#enter-your-adobe-api-credentials)
+    - [Store your Adobe API credentials as Environment Variables](#store-your-adobe-api-credentials-as-environment-variables)
   - [Usage](#usage)
   - [Other Resources](#other-resources)
 
@@ -66,22 +66,37 @@ $ openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 
 
 Make sure that after running this command you have the `cert.pem` and `key.pem` files at the top level of the `.server` directory.
 
+If this step fails, run the following line in your terminal to prompt an instance of Google Chrome with CORS disabled: 
+
+```
+open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args --user-data-dir="/tmp/chrome_dev_test" --disable-web-securityopen -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args --user-data-dir="/tmp/chrome_dev_test" --disable-web-security
+```
+Note that this method is not recommended in terms of security but will suffice as a quick workaround during development.
+
 ### Install Node.js packages
 
 The `package.json` file contains a list of dependencies. Run the following command from the top level directory of the app to install these dependencies:
 
 ```
-$ cd ..
 $ npm install
 ```
 
-### Enter your Adobe API credentials
+### Store your Adobe API credentials as Environment Variables
 
-Enter the required credentials in `public/config.js`:
+Set up a `.env` file to store the API Key and Secret. Create it on the same level as the `package.json` file -- you should see that it is already included in the `.gitignore` file to ensure that our source control history won't contain references to your secrets.   
+
+```
+API_KEY=######################
+API_SECRET=###################
+```
+
+Then `public/config.js` will require the `dotenv` package and execute the `config` function, which reads the `.env` file and sets your environment variables:
 
 ```javascript
-const adobeApiKey = "YOUR_API_KEY";
-const adobeApiSecret = "YOUR_API_SECRET";
+const dotenv = require('dotenv');
+dotenv.config();
+const adobeApiKey = process.env.API_KEY;
+const adobeApiSecret = process.env.API_SECRET;
 
 try {
   if (module) {
@@ -95,6 +110,7 @@ catch (err) {}
 ```
 
 You can get your Adobe API Key and Secret from your registered app page on the [Adobe Developer Console](../../web-oauth2.0-guide.md#register-your-application-and-enable-apis).
+
 
 
 ## Usage

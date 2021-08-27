@@ -1,11 +1,12 @@
-/* Replace "YOUR_ADOBE_API_KEY" with your Api key 
-and "YOUR_ADOBE_API_SECRET" with your API Secret */
+/* 
+Create a .env file and store your API Key and API Secret. 
+The .env file is already included in the .gitignore file to ensure that they aren't accidentally put into source control.
+ */
+const dotenv = require('dotenv');
+dotenv.config();
+const adobeApiKey = process.env.API_KEY;
+const adobeApiSecret = process.env.API_SECRET;
 
-// const adobeApiKey = process.env.API_KEY;
-// const adobeApiSecret = process.env.API_SECRET;
-
-const adobeApiKey = "f72a2329415f4e3ca13718646adfc0d6"
-const adobeApiSecret = "p8e-oC-h3Zk8Ta1Yu8XJVb2ZBRlicRntYArw"
 
 try {
         if (module) {
