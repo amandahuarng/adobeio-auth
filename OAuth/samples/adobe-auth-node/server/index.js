@@ -14,7 +14,7 @@ const port = 8000;
 
 /* Variables needed for authorization */
 const scopes = 'openid,creative_sdk,profile,address,AdobeID,email,offline_access' 
-const redirect_uri = 'https://localhost:8000/callback'
+const redirect_uri = 'https://localhost:8000/callback/'
 
 /* Middlewares */
 app.use(express.static(path.join(__dirname, '../public')));
@@ -46,7 +46,7 @@ app.get('/callback', function(req, res){
 	/* Set options with required paramters */
 	let requestOptions = {
         uri: `https://ims-na1.adobelogin.com/ims/token/v3?grant_type=authorization_code&client_id=${adobeApiKey}&client_secret=${adobeApiSecret}&code=${code}`,
-        method: 'POST',
+        method: 'POST', 
         json: true
 	}
 

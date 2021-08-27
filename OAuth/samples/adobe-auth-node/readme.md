@@ -16,15 +16,17 @@ After setting up the sample, you will have a Node.js app that:
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 ## Contents
 
-1. [GitHub](#github)
-1. [Technology Used](#technologyused)
-1. [Prerequisites](#prerequisites)
-1. [Configuration](#configuration)
-    1. [Create an OpenSSL cert](#createanopensslcert)
-    1. [Install Node.js packages](#installnodejspackages)
-    1. [Enter your Adobe API credentials](#enteryouradobeapicredentials)
-1. [Usage](#usage)
-1. [Other Resources](#otherresources)
+- [OAuth 2.0 Example: Node.js](#oauth-20-example-nodejs)
+  - [Contents](#contents)
+  - [GitHub](#github)
+  - [Technology Used](#technology-used)
+  - [Prerequisites](#prerequisites)
+  - [Configuration](#configuration)
+    - [Create an OpenSSL cert](#create-an-openssl-cert)
+    - [Install Node.js packages](#install-nodejs-packages)
+    - [Enter your Adobe API credentials](#enter-your-adobe-api-credentials)
+  - [Usage](#usage)
+  - [Other Resources](#other-resources)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -46,8 +48,8 @@ This guide will assume that you have read the [Adobe OAuth 2.0 Guide for Web](..
 You must also have [a registered app on the Adobe Developer Console](../../web-oauth2.0-guide.md#register-your-application-and-enable-apis) with the following settings:
 
 1. `Platform`: web
-1. `Default redirect URI`: `https://localhost:8000`
-1. `Redirect URI Pattern`: `https://localhost:8000`
+1. `Default redirect URI`: `https://localhost:8000/callback/`
+1. `Redirect URI Pattern`: `https://localhost:8000/callback/`
 
 ## Configuration
 
