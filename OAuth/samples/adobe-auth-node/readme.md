@@ -109,7 +109,7 @@ Now we can generate a root CA certificate using the key generated. Run the follo
 ```
 $ openssl req -x509 -sha256 -new -nodes -days 3650 -key CA.key -out CA.pem
 ```
-We have specified that the root CA certificate will be valid for 10 years. Now that we have the key and certificate, we can sign the SSL certificate isnce we already created CA. Create a new directory `localhost` inside of `CA` and create the file `localhost.ext` inside. We will store the information that needs to be written into the signed SSL certificate into this file
+We have specified that the root CA certificate will be valid for 10 years. Now that we have the key and certificate, we can sign the SSL certificate since we already created CA. Create a new directory `localhost` inside of `CA` and create the file `localhost.ext` inside. We will store the information that needs to be written into the signed SSL certificate into this file.
 
 ```
 $ mkdir localhost && cd localhost && touch localhost.ext
@@ -150,6 +150,7 @@ open -n -a /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --args
 ```
 Note that this method is not recommended in terms of security but will suffice as a quick workaround during development.
 
+Make sure this line is included in your .gitignore file: ```server/CA/```.
 
 ## Usage
 
